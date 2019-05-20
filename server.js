@@ -10,14 +10,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('combined'));
 
-app.use(require('./app/routing/apiRoutes'))
-app.use(require('./app/routing/htmlRoutes'))
-
-app.get('/', (req, res) => {
-	res.type('text/plain');
-	res.send('JML FriendFinder');
-})
+app.use(require('./app/routing/apiRoutes'));
+app.use(require('./app/routing/htmlRoutes'));
 
 app.listen(PORT, () => {
-	console.log(`Listening on port: ${PORT}`)
+	console.log(`Listening on port: ${PORT}`);
 });
