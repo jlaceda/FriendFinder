@@ -1,0 +1,26 @@
+{
+  "name": "friendfinder",
+  "version": "1.0.0",
+  "description": "an app for finding friends!",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js --trace-sync-io",
+    "watch": "nodemon server.js --trace-sync-io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlaceda/FriendFinder.git"
+  },
+  "author": "John Michael Laceda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jlaceda/FriendFinder/issues"
+  },
+  "homepage": "https://github.com/jlaceda/FriendFinder#readme",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.17.0",
+    "morgan": "^1.9.1"
+  }
+}
