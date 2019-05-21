@@ -31,6 +31,7 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
+					<h5 class="modal-title"></h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -42,6 +43,11 @@
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script>
+		const showModal = (title, bodyHtml) => {
+			$('.modal-title').text(title)
+			$('.modal-body').html(bodyHtml);
+			$('#bestMatchModal').modal('show');
+		};
 		const questions = [
 			'My spirit animal is a Unicorn. Unique, magical and wild.',
 			'My spirit animal is a Wildebeest. We killed Mufasa.',
@@ -72,6 +78,10 @@
 		document.getElementById('survey').innerHTML = questionHtml;
 		document.getElementById('submit').addEventListener('click', async (e) => {
 			e.preventDefault();
+			if (document.getElementById('name').value.length < 1 || document.getElementById('photo').value.length < 1) {
+				showModal('Input Error!', '<p>You need to enter a name and a photo link</p>')
+				return;
+			}
 			const newFriend = {
 				name: document.getElementById('name').value,
 				photo: document.getElementById('photo').value,
@@ -80,18 +90,15 @@
 			for (let i = 0; i < 10; i++) {
 				newFriend.scores[i] = document.getElementById(`${i}`).value;
 			}
-			console.log(newFriend);
 			const postBody = new Blob([JSON.stringify(newFriend)], {type : 'application/json'});
 			const response = await fetch('/api/friends',{
 				method: 'POST',
 				body: postBody
 			});
 			const bestMatch = await response.json();
-			$('.modal-header').prepend(`<h5 class="modal-title">${bestMatch.name}</h5>`)
-			$('.modal-body').html(`
-			<p>Your Best match is ${bestMatch.name}, with a match factor of ${100 - bestMatch.totalDifference}%.</p>
-			<img src="${bestMatch.photo}" width="100%"/>`);
-			$('#bestMatchModal').modal('show');
+			showModal(bestMatch.name,`
+				<p>Your Best match is ${bestMatch.name}, with a match factor of ${100 - bestMatch.totalDifference}.</p>
+				<img src="${bestMatch.photo}" width="100%"/>`);
 		});
 	</script>
 </body>
