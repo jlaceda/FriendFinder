@@ -5,8 +5,96 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>JML FriendFinder - Survey</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
-<body>
-	<h1>JML FriendFinder - Survey</h1>
+<body class="bg-dark">
+	<div class="container-fluid ">
+		<div class="jumbotron shadow-lg">
+			<h2>Answer these questions</h2>
+			<hr>
+			<p>Slide RIGHT if you strongly AGREE with the statement</p>
+			<p>Slide LEFT if you strongly DISAGREE</p>
+			<p>Tap Submit when you're done</p>
+		</div>
+		<div class="jumbotron shadow-lg">
+			<form action="/api/friends" method="POST" id="survey"></form>
+		</div>
+		<div class="footer">
+			<p>
+				<a href="/api/friends" target="_blank">API Friends List</a>
+				<span class="text-muted"> | </span>
+				<a href="https://github.com/jlaceda/FriendFinder" target="_blank">GitHub Repo</a>
+			</p>
+		</div>
+	</div>
+	<div class="modal" tabindex="-1" role="dialog" id="bestMatchModal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+			</div>
+			</div>
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script>
+		const questions = [
+			'My spirit animal is a Unicorn. Unique, magical and wild.',
+			'My spirit animal is a Wildebeest. We killed Mufasa.',
+			'I excel in Math.',
+			'A perfect first date is something chill like a dinner and a movie. Getting to know each other in an intimate quiet setting.',
+			'A perfect first date is something thrilling like skydiving or bungee jumping. I need to know you\'re up for anything.',
+			'I would describe myself as a social butterfly.',
+			'"You only get one shot" - Eminem',
+			'I can tell the difference between Australian and New Zealand accents.',
+			'The early bird gets the worm.',
+			'A moment of the lips, a lifetime on the hips.']
+		let questionHtml = `
+			<div class="form-group">
+				<input type="text" id="name" name="name" placeholder="Your Name (required)" required>
+			</div>
+			<div class="form-group">
+				<input type="text" id="photo" name="photo" placeholder="Photo Url (required)" required>
+			</div>`;
+		for (let i = 0; i < questions.length; i++) {
+			const question = questions[i];
+			questionHtml += `
+			<div class="form-group">
+				<label for="${i}">${question}</label>
+				<input type="range" class="custom-range" min="1" max="5" name="${i}" id="${i}">
+			</div>`;
+		}
+		questionHtml += '<button id="submit" class="btn btn-primary btn-block">Submit</button>';
+		document.getElementById('survey').innerHTML = questionHtml;
+		document.getElementById('submit').addEventListener('click', async (e) => {
+			e.preventDefault();
+			const newFriend = {
+				name: document.getElementById('name').value,
+				photo: document.getElementById('photo').value,
+				scores: []
+			};
+			for (let i = 0; i < 10; i++) {
+				newFriend.scores[i] = document.getElementById(`${i}`).value;
+			}
+			console.log(newFriend);
+			const postBody = new Blob([JSON.stringify(newFriend)], {type : 'application/json'});
+			const response = await fetch('/api/friends',{
+				method: 'POST',
+				body: postBody
+			});
+			const bestMatch = await response.json();
+			console.log(bestMatch);
+			$('.modal-body').html(`
+			<p>Your Best match is ${bestMatch.name}, with a match factor of ${100 - bestMatch.totalDifference}%.</p>
+			<img src='${bestMatch.photo} width='300px'/>'`);
+			$('#bestMatchModal').modal('show');
+		});
+	</script>
 </body>
 </html>
