@@ -46,6 +46,7 @@ router.get('/api/friends', (req, res) => {
 
 router.post('/api/friends', (req, res) => {
 	const newFriend = req.body;
+	newFriend.scores = newFriend.scores.map(Number);
 	const bestMatch = findBestMatch(newFriend.scores);
 	res.json(bestMatch);
 	friends.push(newFriend);
